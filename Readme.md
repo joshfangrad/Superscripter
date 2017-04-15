@@ -1,4 +1,4 @@
----
+
 #Superscripter
 
 Superscripter is a Google Docs addon that makes writing super/subscript numbers real easy. By default, the Google Docs super/subscript hotkey is a pain to type, and also zooms you browser. Due to this, you usually end up having to do it manually with your mouse:
