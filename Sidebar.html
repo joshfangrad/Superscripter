@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <base target='_top'>
+        <link rel='stylesheet' href='https://ssl.gstatic.com/docs/script/css/add-ons1.css'>
+        <style>
+            body {
+                background-color: #f9f9f9;
+            }
+
+            .grey {
+                color: rgb(128, 128, 128);   
+            }
+
+            .flexTop {
+                padding-top: 25px;
+                display: flex;
+                width: 100%;
+                justify-content: space-around;
+            }
+
+            .flexMain {
+                display: flex;
+                width: 100%;
+                justify-content: space-around;
+                padding-bottom: 10px;
+            }
+
+            .bindButton {
+                background: -moz-linear-gradient(top, #f5f5f5, #f1f1f1);
+                background: -ms-linear-gradient(top, #f5f5f5, #f1f1f1);
+                background: -o-linear-gradient(top, #f5f5f5, #f1f1f1);
+                background: -webkit-linear-gradient(top, #f5f5f5, #f1f1f1);
+                background: linear-gradient(top, #f5f5f5, #f1f1f1);
+                border: 1px solid #dcdcdc;
+                border-radius: 2px;
+                box-shadow: none;
+                color: #333;
+                cursor: pointer;
+                font-family: arial, sans-serif;
+                font-size: 40px;
+                font-weight: bold;
+                height: 100px;
+                line-height: 100px;
+                margin: 0;
+                min-width: 100px;
+                outline: 0;
+                padding: 0 8px;
+                text-align: center;
+                vertical-align: middle;
+                white-space: nowrap;
+                -moz-user-select: none;
+                -ms-user-select: none;
+                user-select: none;
+            }
+
+            .BINDING {
+                background: -moz-linear-gradient(top, #4d90fe, #4787ed);
+                background: -ms-linear-gradient(top, #4d90fe, #4787ed);
+                background: -o-linear-gradient(top, #4d90fe, #4787ed);
+                background: -webkit-linear-gradient(top, #4d90fe, #4787ed);
+                background: linear-gradient(top, #4d90fe, #4787ed);
+                background: linear-gradient(#4d90fe, #4787ed);
+                border: 1px solid #3079ed;
+                color: #fff;
+            }
+
+            .btn {
+                width: 80%;
+                margin: auto;
+            }
+
+            .spacer { 
+                padding: auto;
+                margin-top: 10px;
+                margin-bottom: 10px;
+                text-align: center;
+            }
+
+            .status {
+                color: rgb(130, 130, 130);
+                font-size: 15px;
+                font-style: italic;
+                text-align: center;
+                min-height: 20px;
+            }
+        </style>
+    </head>
+
+    <body>
+        <div class='flexTop'>
+            <label for='super' class='status'>superscript:</label>
+            <label for='sub' class='status'>subscript:</label>
+        </div>
+        <div class='flexMain'>
+            <div class='bindButton' id='super' onclick='rebindHandler("super")'></div>
+            <div class='bindButton' id='sub' onclick='rebindHandler("sub")'></div>
+        </div>
+        <div class='status' id='status'></div>
+        <div class='spacer'>
+            <button class='share btn' onclick='resetPrefs()'>Reset</button>
+        </div>
+        <div class='spacer'>
+            <button class='action btn' onclick='google.script.run.format()'>Format</button>
+        </div>
+    </body>
+    <script>
+        var superButton = document.getElementById('super');
+        var subButton = document.getElementById('sub');
+
+        //function for when the rebindable keys are clicked
+        function rebindHandler(id) {
+            if (document.getElementById(id).className  != 'bindButton BINDING') {
+                superButton.className = 'bindButton';
+                subButton.className = 'bindButton';
+                document.getElementById(id).className = 'bindButton BINDING';
+                status('Press a key to rebind.');
+                document.addEventListener('keypress', checkBind, false)
+            } else {
+                document.getElementById(id).className = 'bindButton';
+                removeListener();
+                status('');
+            }
+        }
+
+        //function for use with the keypress event listener
+        function checkBind(e) {
+            var key = e.which || e.keyCode;
+            var id;
+            if (superButton.className == 'bindButton BINDING') {
+                id = 'super';
+            } else {
+                id = 'sub';
+            }
+            if (!document.getElementById(id).interHTML != key) {
+                var keyString = String.fromCharCode(key);
+                setBind(id, keyString);
+                status('');
+                document.getElementById(id).className = 'bindButton';
+                document.getElementById(id).innerHTML = keyString;
+            }
+            removeListener();
+        }
+
+        //function to save a new binding to user prefs
+        function setBind(id, val) {
+            return new Promise((resolve) => {
+                google.script.run.savePref(id, val);
+            });
+        }
+
+        //function to retrieve user prefs
+        function getProperties() {
+            return new Promise((resolve) => {
+                google.script.run.withSuccessHandler((userProps) => {
+                    resolve(userProps);
+                }).getPrefs();
+            });
+        }
+        
+        function resetPrefs() {
+            google.script.run.newPrefs();
+            loadProperties();
+        }
+
+        //load the current user keybinds to they rebind buttons
+        async function loadProperties() {
+            status('Loading...');
+            var userProps = await getProperties();
+            status('');
+            superButton.innerHTML = userProps['super'];
+            subButton.innerHTML = userProps['sub'];
+        }
+
+        function removeListener() {
+            document.removeEventListener('keypress', checkBind, false)
+        }
+
+        function status(status) {
+            document.getElementById('status').innerHTML = status;
+        }
+
+        //load the saved keybinds when the sidebar is opened
+        loadProperties();
+    </script>
+</html>
