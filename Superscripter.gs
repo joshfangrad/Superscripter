@@ -1,4 +1,4 @@
-var userProps = PropertiesService.getUserProperties();
+
 
 function onOpen(e) {
     DocumentApp.getUi().createAddonMenu()
@@ -20,15 +20,18 @@ function showSidebar() {
 }
 
 function newPrefs() {
+    var userProps = PropertiesService.getUserProperties();
     userProps.setProperty('super', '^');
     userProps.setProperty('sub', '>');
 }
 
 function savePref(id, val) {
+    var userProps = PropertiesService.getUserProperties();
     userProps.setProperty(id, val);
 }
 
 function getPrefs() {
+    var userProps = PropertiesService.getUserProperties();
     var charPrefs = {
         super: userProps.getProperty('super'),
         sub: userProps.getProperty('sub')
