@@ -1,13 +1,13 @@
 var userProps = PropertiesService.getUserProperties();
 
-function onOpen() {
+function onOpen(e) {
     DocumentApp.getUi().createAddonMenu()
         .addItem('Format', 'format')
         .addItem('Options', 'showSidebar')
         .addToUi();
 }
 
-function onInstall() {
+function onInstall(e) {
     //if it's their first time using the addon, set the default prefs
     newPrefs();
     onOpen();
