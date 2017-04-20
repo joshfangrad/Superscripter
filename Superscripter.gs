@@ -10,7 +10,7 @@ function onOpen(e) {
 function onInstall(e) {
     //if it's their first time using the addon, set the default prefs
     newPrefs();
-    onOpen();
+    onOpen(e);
 }
 
 function showSidebar() {
