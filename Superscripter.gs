@@ -5,6 +5,18 @@ function onOpen(e) {
         .addItem('Format', 'format')
         .addItem('Options', 'showSidebar')
         .addToUi();
+
+    //we have this for a while so curent users get the new preferences
+    var prefs = getPrefs();
+    if (!prefs['letter']) {
+        savePref('letter', 'false');
+    } 
+    if (!prefs['plus']) {
+        savePref('plus', 'false');
+    }
+    if (!prefs['minus']) {
+        savePref('minus', 'false');
+    }
 }
 
 function onInstall(e) {
@@ -21,8 +33,8 @@ function showSidebar() {
 
 function newPrefs() {
     var userProps = PropertiesService.getUserProperties();
-    userProps.setProperty('super', '^');
-    userProps.setProperty('sub', '>');
+    var defaultProps = {super: '^', sub: '>', letter: 'false', plus: 'false', minus: 'false'};
+    userProps.setProperties(defaultProps, true);
 }
 
 function savePref(id, val) {
@@ -34,7 +46,10 @@ function getPrefs() {
     var userProps = PropertiesService.getUserProperties();
     var charPrefs = {
         super: userProps.getProperty('super'),
-        sub: userProps.getProperty('sub')
+        sub: userProps.getProperty('sub'),
+        letter: userProps.getProperty('letter'),
+        plus: userProps.getProperty('plus'),
+        minus: userProps.getProperty('minus')
     };
     return charPrefs;
 }
@@ -45,20 +60,37 @@ function format() {
     //there are some letters we can't escape with a backslash otherwise they would do other regex things
     var letterBlacklist = new RegExp('^[wsdcbn]','i');
     var blackFind = [prefs['super'].match(letterBlacklist), prefs['sub'].match(letterBlacklist)];
-    //construct our regexes out of our characters
-    var superRegex;
-    var subRegex;
-    if (blackFind[0]) {
-        superRegex = new RegExp('(' + prefs['super'] + ')[0-9.]+', 'g');
-    } else {
-        superRegex = new RegExp('(\\' + prefs['super'] + ')[0-9.]+', 'g');
+    //construct our regexes out of strings
+    var superString = '(';
+    var subString = '(';
+    //we always escape the first regex character unless it's a blacklisted char
+    if (!blackFind[0]) {
+        superString += '\\';
     }
-    if (blackFind[1]) {
-        subRegex = new RegExp('(' + prefs['sub'] + ')[0-9.]+', 'g');
-    } else {
-        subRegex = new RegExp('(\\' + prefs['sub'] + ')[0-9.]+', 'g');
+    if (!blackFind[1]) {
+        subString += '\\';
     }
-    Logger.log(superRegex);
+    superString += prefs['super'] + ')[';
+    subString += prefs['sub'] + ')[';
+    //add extra regex options based on user settings
+    if (prefs['letter'] == 'true') {
+        superString += 'a-z';
+        subString += 'a-z';
+    }
+    if (prefs['minus'] == 'true') {
+        superString += '-';
+        subString += '-';
+    }
+    if (prefs['plus'] == 'true') {
+        superString += '+';
+        subString += '+';
+    }
+    superString += '0-9.]+';
+    subString += '0-9.]+';
+    //end regex will look something like:
+    //   /(\^)[a-z-+0-9.]+/g
+    superRegex = new RegExp(superString, 'g');
+    subRegex = new RegExp(subString, 'g');
     var checks = [superRegex, subRegex];
 
     var doc = DocumentApp.getActiveDocument();
@@ -67,12 +99,10 @@ function format() {
     for (var j = 0; j < checks.length; j++) {
         for (var i = 0; i < paras.length; i++) {
             while (match = checks[j].exec(paras[i].getText())) {
-                var find;
-                if (blackFind[j]) {
-                    find = paras[i].findText(match[0]);
-                } else {
-                    find = paras[i].findText('\\' + match[0]);
-                }
+                //plusses need to be escaped
+                match[0] = match[0].replace(/\+/g, '\\+');
+                //we also escape the first character to avoid regex problems
+                var find = paras[i].findText('\\' + match[0]);
                 if (find) {
                     var elementText = find.getElement().asText();
                     if (j == 0) {

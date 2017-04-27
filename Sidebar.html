@@ -84,6 +84,10 @@
                 text-align: center;
                 min-height: 20px;
             }
+
+            .optionsDrop {
+                display: none;
+            }
         </style>
     </head>
 
@@ -98,17 +102,29 @@
         </div>
         <div class='status' id='status'></div>
         <div class='spacer'>
+            <button class ='btn' onclick='toggleDrop()'>Extra Options</button>
+            <div id='optionsDrop' class='optionsDrop'>
+                <div class='spacer'><input type='checkbox' id='letter' onclick='checkboxHandler("letter")'>allow lowercase letters</input></div>
+                <div class='spacer'><input type='checkbox' id='plus' onclick='checkboxHandler("plus")'>allow plusses</input></div>
+                <div class='spacer'><input type='checkbox' id='minus' onclick='checkboxHandler("minus")'>allow minuses</input></div>
+            </div>
+        </div>
+        <div class='spacer'>
             <button class='share btn' onclick='resetPrefs()'>Reset</button>
         </div>
         <div class='spacer'>
             <button class='action btn' onclick='google.script.run.format()'>Format</button>
         </div>
     </body>
+
     <script>
         var superButton = document.getElementById('super');
         var subButton = document.getElementById('sub');
+        var letter = document.getElementById('letter');
+        var plus = document.getElementById('plus');
+        var minus = document.getElementById('minus');
 
-        //function for when the rebindable keys are clicked
+        //function called when the rebindable keys are clicked
         function rebindHandler(id) {
             if (document.getElementById(id).className  != 'bindButton BINDING') {
                 superButton.className = 'bindButton';
@@ -121,6 +137,12 @@
                 removeListener();
                 status('');
             }
+        }
+
+        //function called when the checkboxes are clicked
+        function checkboxHandler(id) {
+            var checkbox = document.getElementById(id);
+            setBind(id, checkbox.checked);
         }
 
         //function for use with the keypress event listener
@@ -170,6 +192,20 @@
             status('');
             superButton.innerHTML = userProps['super'];
             subButton.innerHTML = userProps['sub'];
+            //we have to do this silly 'true' check because google only stores strings
+            letter.checked = (userProps['letter'] == 'true');
+            plus.checked = (userProps['plus'] == 'true');
+            minus.checked = (userProps['minus'] == 'true');
+        }
+
+        //toggles the dropdown menu
+        function toggleDrop() {
+            var drop = document.getElementById('optionsDrop');
+            if (drop.style.display === 'none') {
+                drop.style.display = 'block';
+            } else {
+                drop.style.display = 'none';
+            }
         }
 
         function removeListener() {
