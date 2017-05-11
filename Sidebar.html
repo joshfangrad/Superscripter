@@ -107,6 +107,7 @@
                 <div class='spacer'><input type='checkbox' id='letter' onclick='checkboxHandler("letter")'>allow lowercase letters</input></div>
                 <div class='spacer'><input type='checkbox' id='plus' onclick='checkboxHandler("plus")'>allow plusses</input></div>
                 <div class='spacer'><input type='checkbox' id='minus' onclick='checkboxHandler("minus")'>allow minuses</input></div>
+                <div class='spacer'><input type='checkbox' id='slash' onclick='checkboxHandler("slash")'>allow forward slashes</input></div>
             </div>
         </div>
         <div class='spacer'>
@@ -123,6 +124,7 @@
         var letter = document.getElementById('letter');
         var plus = document.getElementById('plus');
         var minus = document.getElementById('minus');
+        var slash = document.getElementById('slash');
 
         //function called when the rebindable keys are clicked
         function rebindHandler(id) {
@@ -196,6 +198,7 @@
             letter.checked = (userProps['letter'] == 'true');
             plus.checked = (userProps['plus'] == 'true');
             minus.checked = (userProps['minus'] == 'true');
+            slash.checked = (userProps['slash'] == 'true');
         }
 
         //toggles the dropdown menu

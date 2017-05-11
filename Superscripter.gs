@@ -17,6 +17,9 @@ function onOpen(e) {
     if (!prefs['minus']) {
         savePref('minus', 'false');
     }
+    if (!prefs['slash']) {
+        savePref('slash', 'false');
+    }
 }
 
 function onInstall(e) {
@@ -33,7 +36,7 @@ function showSidebar() {
 
 function newPrefs() {
     var userProps = PropertiesService.getUserProperties();
-    var defaultProps = {super: '^', sub: '>', letter: 'false', plus: 'false', minus: 'false'};
+    var defaultProps = {super: '^', sub: '>', letter: 'false', plus: 'false', minus: 'false', slash: 'false'};
     userProps.setProperties(defaultProps, true);
 }
 
@@ -49,7 +52,8 @@ function getPrefs() {
         sub: userProps.getProperty('sub'),
         letter: userProps.getProperty('letter'),
         plus: userProps.getProperty('plus'),
-        minus: userProps.getProperty('minus')
+        minus: userProps.getProperty('minus'),
+        slash: userProps.getProperty('slash')
     };
     return charPrefs;
 }
@@ -84,6 +88,10 @@ function format() {
     if (prefs['plus'] == 'true') {
         superString += '+';
         subString += '+';
+    }
+    if (prefs['slash'] == 'true') {
+        superString += '/';
+        subString += '/';
     }
     superString += '0-9.]+';
     subString += '0-9.]+';
