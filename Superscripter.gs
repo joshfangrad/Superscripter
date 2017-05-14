@@ -93,10 +93,10 @@ function format() {
         superString += '/';
         subString += '/';
     }
-    superString += '0-9.]+';
-    subString += '0-9.]+';
+    superString += '½⅓⅔¼¾⅕⅖⅗⅘⅙⅚⅐⅛⅜⅝⅞⅑⅒0-9.]+';
+    subString += '½⅓⅔¼¾⅕⅖⅗⅘⅙⅚⅐⅛⅜⅝⅞⅑⅒0-9.]+';
     //end regex will look something like:
-    //   /(\^)[a-z-+0-9.]+/g
+    //   /(\^)[a-z-+/½⅓⅔¼¾⅕⅖⅗⅘⅙⅚⅐⅛⅜⅝⅞⅑⅒0-9.]+/g
     superRegex = new RegExp(superString, 'g');
     subRegex = new RegExp(subString, 'g');
     var checks = [superRegex, subRegex];
